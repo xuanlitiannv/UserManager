@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sau.edu.dao.UserDao">
+    <sql id="usercolumn">
+        id,email,phone,password,realname,sex,permission,introduce,news
+    </sql>
+	<!-- 核对用户登录信息  -->
+	<select id="getUserByName_Pswd" parameterType="User" resultType="User">
+	    SELECT <include refid="usercolumn"></include>
+	    FROM user
+	    WHERE email=#{email}
+	    AND password=#{password}
+	</select>
+	<!-- 验证邮箱（用户名）是否重复  -->
+	<select id="getUserByEmail" parameterType="String" resultType="User">
+	    SELECT <include refid="usercolumn"></include>
+	    FROM user
+	    WHERE email=#{email}
+	</select>
+	<!-- 注册添加用户  （默认首字母不区分大小写）-->
+	<insert id="add_regist_User" parameterType="User">
+	    INSERT INTO user(email,phone,password,realname,sex,permission,introduce,news)
+	    VALUES(#{email},#{phone},#{password},#{realname},#{sex},#{permission},#{introduce},#{news})
+	</insert>
+	<!-- 列举用户信息   (注意查询条件要在选择不为空时进行and)-->
+	<select id="listUser" parameterType="User" resultType="User" >
+	     SELECT u.id,u.email,u.phone,u.realname,u.sex,u.permission
+	     FROM user u
+	     <where>
+		    <if test="email!=null and email!=''">
+		        u.email LIKE #{email}
+		    </if>
+		    <if test="phone!=null and phone!=''">
+		    AND u.phone LIKE #{phone}
+		    </if>
+		    <if test="realname!=null and realname!=''">
+		    AND u.realname LIKE #{realname}
+		    </if>
+		    <if test="permission!=null and permission!=''">
+		    AND u.permission=#{permission}
+		    </if>
+		  </where>
+	</select>
+	<!-- 管理员添加用户 -->
+	<insert id="addUser" parameterType="User">
+	    INSERT INTO user(email,phone,password,realname,sex,permission,introduce,news)
+	    VALUES(#{email},#{phone},#{password},#{realname},#{sex},#{permission},#{introduce},#{news})
+	</insert>
+	<!-- 查询用户信息 -->
+	<select id="getUserById" parameterType="Integer"  resultType="User">
+	     SELECT<include refid="usercolumn"></include>
+	     FROM user
+	     WHERE id=#{id}
+	</select>
+	<!-- 更改用户信息 -->
+	<update id="modifyUserById" parameterType="User">
+	   UPDATE user
+	   <set>
+	   <if test="email!=null">
+	      email=#{email},
+	   </if>
+	   <if test="phone!=null">
+	      phone=#{phone},
+	   </if>
+	   <if test="realname!=null">
+	      realname=#{realname},
+	   </if>
+	   <if test="permission!=null">
+	      permission=#{permission}
+	   </if>
+	   </set>
+	   WHERE id=#{id}
+	</update>
+	<!-- 删除用户 -->
+	<delete id="delUserById">
+	    DELETE FROM user
+	    WHERE id=#{id}
+	</delete>
+	<!-- 通过email查询用户信息 -->
+	<select id="getUser_permission_ByEmail" parameterType="String"  resultType="User">
+	    SELECT<include refid="usercolumn"></include>
+	    FROM user
+	    WHERE email=#{email}
+	</select>
+</mapper>
